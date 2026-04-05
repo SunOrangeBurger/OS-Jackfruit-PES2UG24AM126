@@ -145,42 +145,23 @@ make clean
 
 ## Demo with Screenshots
 
-### 1. Multi-Container Supervision
 
 ![Multi-Container Supervision](screenshots/1-multi-container.png)
 
-This screenshot demonstrates the supervisor running with multiple containers (alpha, beta, mem-test) managed under a single supervisor process. The supervisor terminal shows it started successfully and is listening on the control socket at `/tmp/mini_runtime.sock`.
 
-### 2. Metadata Tracking
 
 ![Metadata Tracking](screenshots/2-metadata-ps.png)
 
-The `engine ps` command displays tracked container metadata including container ID, host PID, state (running/exited/killed), and configured soft/hard memory limits in MiB. This demonstrates the supervisor's ability to maintain and query container state.
 
-### 3. Bounded-Buffer Logging and CLI/IPC
 
 ![Container Logs and CLI](screenshots/4-container-logs.png)
 
-This screenshot shows the logging pipeline in action. Container output is captured through pipes, buffered, and written to per-container log files in the `logs/` directory. The CLI commands (start, ps, logs) communicate with the supervisor via UNIX domain socket, demonstrating the second IPC mechanism (Path B - control plane).
 
-### 4. Soft-Limit and Hard-Limit Enforcement
 
 ![Kernel Monitor Logs](screenshots/3-kernel-logs.png)
 
-The `dmesg` output shows the kernel monitor in action:
-- **Soft limit warnings**: When containers exceed their soft memory limit, the kernel module logs a warning but allows the process to continue
-- **Hard limit enforcement**: When containers exceed their hard limit, the kernel module sends SIGKILL to terminate them immediately
-- The monitor tracks each container by PID and container ID, checking RSS every second
-
-### 5. Clean Teardown
 
 ![Clean Teardown](screenshots/5-cleanup.png)
-
-This screenshot demonstrates proper resource cleanup. After stopping containers and shutting down the supervisor, no zombie processes remain. All child processes are properly reaped, threads are joined, file descriptors are closed, and the kernel module can be unloaded cleanly without memory leaks.
-
----
-
-## Engineering Analysis
 
 ### 1. Isolation Mechanisms
 
