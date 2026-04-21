@@ -27,11 +27,17 @@ echo "== Supervised Runtime Project Preflight =="
 if [[ -r /etc/os-release ]]; then
     # shellcheck disable=SC1091
     source /etc/os-release
-    [[ "${ID:-}" == "ubuntu" ]] || fail "Unsupported distro: ${ID:-unknown}. Use Ubuntu 22.04/24.04 VM."
-    case "${VERSION_ID:-}" in
-        22.04|24.04) ok "Ubuntu version ${VERSION_ID} detected." ;;
-        *) fail "Unsupported Ubuntu version: ${VERSION_ID:-unknown}. Use 22.04 or 24.04." ;;
-    esac
+    # Accept Ubuntu and Debian-based distros like Zorin
+    if [[ "${ID:-}" == "ubuntu" ]]; then
+        case "${VERSION_ID:-}" in
+            22.04|24.04) ok "Ubuntu version ${VERSION_ID} detected." ;;
+            *) warn "Ubuntu version ${VERSION_ID:-unknown} detected. Recommended: 22.04 or 24.04." ;;
+        esac
+    elif [[ "${ID:-}" == "zorin" ]] || [[ "${ID_LIKE:-}" == *"ubuntu"* ]] || [[ "${ID_LIKE:-}" == *"debian"* ]]; then
+        ok "Debian-based distro detected: ${ID:-unknown} (${VERSION_ID:-unknown})."
+    else
+        fail "Unsupported distro: ${ID:-unknown}. Use Ubuntu 22.04/24.04 VM or Debian-based distro."
+    fi
 else
     fail "Cannot read /etc/os-release to verify environment."
 fi
